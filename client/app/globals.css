@@ -1,26 +1,128 @@
 @import "tailwindcss";
 
+/* ===================================================== */
+/* LIGHT THEME (BASE)                                    */
+/* ===================================================== */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --color-bg: #ffffff;
+  --color-text: #171717;
+
+  --color-surface: #ffffff;
+  --color-border: #e5e7eb;
+  --color-header: #f9fafb;
+  --color-muted: #6b7280;
+
+  --color-gain: #16a34a;
+  --color-loss: #dc2626;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ===================================================== */
+/* DARK THEME OVERRIDES                                  */
+/* ===================================================== */
+.dark {
+  --color-bg: #020617;
+  --color-text: #e5e7eb;
+
+  --color-surface: #111827;
+  --color-border: #1f2937;
+  --color-header: #020617;
+  --color-muted: #9ca3af;
+
+  --color-gain: #22c55e;
+  --color-loss: #ef4444;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ===================================================== */
+/* UTILITIES (CUSTOM – DO NOT @apply THESE)              */
+/* ===================================================== */
+@layer utilities {
+  .bg-app {
+    background-color: var(--color-bg);
+  }
+
+  .text-app {
+    color: var(--color-text);
+  }
+
+  .bg-surface {
+    background-color: var(--color-surface);
+  }
+
+  .border-border {
+    border-color: var(--color-border);
+  }
+
+  .bg-header {
+    background-color: var(--color-header);
+  }
+
+  .text-muted {
+    color: var(--color-muted);
+  }
+
+  .text-gain {
+    color: var(--color-gain);
+  }
+
+  .text-loss {
+    color: var(--color-loss);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ===================================================== */
+/* COMPONENT STYLES (USE CSS VARIABLES DIRECTLY)         */
+/* ===================================================== */
+@layer components {
+  .table-container {
+    border-radius: 0.5rem;
+    border: 1px solid var(--color-border);
+    background-color: var(--color-surface);
+    overflow-x: auto;
+    width: 100%;
+  }
+
+  .table {
+    min-width: 100%;
+    font-size: 0.875rem;
+  }
+
+  .table-head {
+    background-color: var(--color-header);
+  }
+
+  .table-head-cell {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-muted);
+  }
+
+  .table-row {
+    transition: background-color 0.15s ease-in-out;
+  }
+
+  .table-row:hover {
+    background-color: rgba(0, 0, 0, 0.03);
+  }
+
+  .dark .table-row:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  .table-cell {
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+  }
+
+  .cell-gain {
+    color: var(--color-gain);
+    font-weight: 500;
+  }
+
+  .cell-loss {
+    color: var(--color-loss);
+    font-weight: 500;
+  }
 }
