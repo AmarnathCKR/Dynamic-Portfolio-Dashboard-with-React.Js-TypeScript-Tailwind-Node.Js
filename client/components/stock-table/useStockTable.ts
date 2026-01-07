@@ -3,23 +3,25 @@ import {
   useTable,
   useSortBy,
   usePagination,
-  Column,
-  TableOptions,
+  useGlobalFilter,
 } from "react-table";
+import { Column } from "react-table";
 
-export const useStockTable = <T extends object>(
+export function useStockTable<T extends object>(
   data: T[],
   columns: Column<T>[],
   pageSize = 10
-) => {
-  const options: TableOptions<T> = {
-    data,
-    columns,
-    initialState: {
-      pageIndex: 0,
-      pageSize,
-    } as Partial<any>,
-  };
-
-  return useTable(options, useSortBy, usePagination);
-};
+) {
+  return useTable<T>(
+    {
+      data,
+      columns,
+      initialState: {
+        pageSize,
+      } as Partial<any>, 
+    },
+    useGlobalFilter, 
+    useSortBy,       
+    usePagination
+  );
+}
