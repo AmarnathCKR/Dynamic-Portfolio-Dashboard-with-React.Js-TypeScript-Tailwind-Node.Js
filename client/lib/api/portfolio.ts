@@ -68,15 +68,10 @@ const MOCK_PORTFOLIO: Stock[] = [
  * Simulates network latency and keeps the same async contract
  */
 export async function fetchPortfolio(): Promise<Stock[]> {
-  // simulate network delay (realistic)
-  await  fetch('https://fuzzy-telegram-j655vv9jgjxfqjx6-4000.app.github.dev/api/portfolio').then(res => res.json());
+ const data =  await  fetch('https://fuzzy-telegram-j655vv9jgjxfqjx6-4000.app.github.dev/api/portfolio').then(res => res.json());
 
-  // optional: simulate small CMP fluctuation for polling demo
-  return MOCK_PORTFOLIO.map((stock) => ({
+  return data.map((stock: Stock) => ({
     ...stock,
-    cmp:
-      typeof stock.cmp === "number"
-        ? Number((stock.cmp * (1 + (Math.random() - 0.5) / 100)).toFixed(2))
-        : stock.cmp,
-  }));
+    cmp: +(stock.cmp! * (0.98 + Math.random() * 0.04)).toFixed(2),
+  })) ;
 }

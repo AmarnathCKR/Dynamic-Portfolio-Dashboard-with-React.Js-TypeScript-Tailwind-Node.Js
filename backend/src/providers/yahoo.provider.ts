@@ -1,18 +1,57 @@
-import { MarketDataProvider } from "./marketData.provider";
+import YahooFinance from "yahoo-finance2";
 
-export class YahooProvider implements MarketDataProvider {
-  async getCMP(symbol: string): Promise<number> {
-    const base = {
-      TCS: 3450,
-      HDFCBANK: 1450,
-      RELIANCE: 2525,
-    }[symbol] ?? 1000;
+const yahooFinance = new YahooFinance();
 
-    const fluctuation = 1 + (Math.random() - 0.5) / 100;
-    return Number((base * fluctuation).toFixed(2));
+type YahooQuote = {
+  regularMarketPrice?: number;
+  trailingPE?: number;
+  earningsTimestamp?: Date;
+};
+
+export class YahooProvider {
+  private mapSymbol(symbol: string): string {
+    return `${symbol}.NS`;
   }
 
-  async getFundamentals() {
-    return { peRatio: null, latestEarnings: null };
+  async getStockData(symbol: string) {
+    try {
+      const quote = (await yahooFinance.quote(
+        this.mapSymbol(symbol)
+      )) as YahooQuote | null;
+
+      if (!quote) {
+        return {
+          cmp: null,
+          peRatio: null,
+          latestEarnings: null,
+        };
+      }
+
+      return {
+        cmp:
+          typeof quote.regularMarketPrice === "number"
+            ? quote.regularMarketPrice
+            : null,
+
+        peRatio:
+          typeof quote.trailingPE === "number"
+            ? Number(quote.trailingPE.toFixed(2))
+            : null,
+
+        latestEarnings: quote.earningsTimestamp
+          ? quote.earningsTimestamp.toLocaleDateString("en-IN", {
+              year: "numeric",
+              month: "short",
+            })
+          : null,
+      };
+    } catch (err) {
+      console.error("[YahooProvider]", symbol, err);
+      return {
+        cmp: null,
+        peRatio: null,
+        latestEarnings: null,
+      };
+    }
   }
 }
