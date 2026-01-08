@@ -1,7 +1,7 @@
 import { Stock } from "@/components/stock-table/types";
 
 export async function fetchPortfolio(): Promise<Stock[]> {
- const data =  await  fetch('https://fuzzy-telegram-j655vv9jgjxfqjx6-4000.app.github.dev/api/portfolio').then(res => res.json());
+ const data =  await  fetch(process.env.NEXT_PUBLIC_API_URL+'/portfolio').then(res => res.json());
 
   return data.map((stock: Stock) => ({
     ...stock,
