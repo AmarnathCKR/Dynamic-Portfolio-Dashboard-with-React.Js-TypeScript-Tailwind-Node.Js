@@ -1,12 +1,10 @@
 import YahooFinance from "yahoo-finance2";
+import { MemoryCache } from "../cache/memory.cache";
 
-const yahooFinance = new YahooFinance();
+const yahooFinance = new YahooFinance({ suppressNotices: ["yahooSurvey"] });
+const cache = new MemoryCache<any>();
 
-type YahooQuote = {
-  regularMarketPrice?: number;
-  trailingPE?: number;
-  earningsTimestamp?: Date;
-};
+const CACHE_TTL = 30 * 1000;
 
 export class YahooProvider {
   private mapSymbol(symbol: string): string {
@@ -14,44 +12,41 @@ export class YahooProvider {
   }
 
   async getStockData(symbol: string) {
+    const cacheKey = `yahoo:${symbol}`;
+
+    const cached = cache.get(cacheKey);
+    if (cached) {
+      console.log("[YahooProvider] Cache hit for", symbol,cached);
+      return cached;
+    }
+
     try {
-      const quote = (await yahooFinance.quote(
-        this.mapSymbol(symbol)
-      )) as YahooQuote | null;
+      const quote = await yahooFinance.quote(this.mapSymbol(symbol));
 
-      if (!quote) {
-        return {
-          cmp: null,
-          peRatio: null,
-          latestEarnings: null,
-        };
-      }
-
-      return {
+      const data = {
         cmp:
-          typeof quote.regularMarketPrice === "number"
+          typeof quote?.regularMarketPrice === "number"
             ? quote.regularMarketPrice
             : null,
 
         peRatio:
-          typeof quote.trailingPE === "number"
+          typeof quote?.trailingPE === "number"
             ? Number(quote.trailingPE.toFixed(2))
             : null,
 
-        latestEarnings: quote.earningsTimestamp
+        latestEarnings: quote?.earningsTimestamp
           ? quote.earningsTimestamp.toLocaleDateString("en-IN", {
               year: "numeric",
               month: "short",
             })
           : null,
       };
-    } catch (err) {
-      console.error("[YahooProvider]", symbol, err);
-      return {
-        cmp: null,
-        peRatio: null,
-        latestEarnings: null,
-      };
+
+      cache.set(cacheKey, data, CACHE_TTL);
+      return data;
+    } catch (error) {
+      console.error("[YahooProvider]", symbol, error);
+      return { cmp: null, peRatio: null, latestEarnings: null };
     }
   }
 }
