@@ -227,4 +227,4 @@ This project is created solely for evaluation and educational purposes as part o
 
 ## 🙌 Author
 **Amarnath (Amar)**  
-Full-Stack Engineer
+Frontend / Full-Stack Engineer
