@@ -17,9 +17,10 @@ export default function SectorSummaryCard({ sector, stocks }: Props) {
   );
 
   return (
-    <div className="p-4 rounded-md border bg-surface border-border flex justify-between">
+    <div className="p-4 rounded-md border bg-surface border-border flex flex-row gap-3 sm:flex-row sm:items-center justify-between">
       <h2 className="font-semibold">{sector}</h2>
-      <div className="flex gap-6 text-sm">
+
+      <div className="flex flex-col gap-1 text-sm sm:flex-row sm:gap-6">
         <span>Investment: ₹{summary.investment.toFixed(2)}</span>
         <span>Value: ₹{summary.presentValue.toFixed(2)}</span>
         <span
