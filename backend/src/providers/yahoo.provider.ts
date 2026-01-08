@@ -12,40 +12,39 @@ export class YahooProvider {
   }
 
   async getStockData(symbol: string) {
-    const cacheKey = `yahoo:${symbol}`;
+    const yahooSymbol = this.mapSymbol(symbol);
+    const cacheKey = `yahoo:${yahooSymbol}`;
 
     const cached = cache.get(cacheKey);
-    if (cached) {
-      console.log("[YahooProvider] Cache hit for", symbol,cached);
-      return cached;
-    }
+    if (cached) return cached;
 
     try {
-      const quote = await yahooFinance.quote(this.mapSymbol(symbol));
+      const quote = await yahooFinance.quote(yahooSymbol);
+
+      const earningsDate =
+        typeof quote?.earningsTimestamp === "number"
+          ? new Date(quote.earningsTimestamp)
+          : quote?.earningsTimestamp instanceof Date
+          ? quote.earningsTimestamp
+          : null;
 
       const data = {
-        cmp:
-          typeof quote?.regularMarketPrice === "number"
-            ? quote.regularMarketPrice
-            : null,
+        cmp: typeof quote?.regularMarketPrice === "number"
+          ? quote.regularMarketPrice
+          : null,
 
-        peRatio:
-          typeof quote?.trailingPE === "number"
-            ? Number(quote.trailingPE.toFixed(2))
-            : null,
+        peRatio: typeof quote?.trailingPE === "number"
+          ? Number(quote.trailingPE.toFixed(2))
+          : null,
 
-        latestEarnings: quote?.earningsTimestamp
-          ? quote.earningsTimestamp.toLocaleDateString("en-IN", {
-              year: "numeric",
-              month: "short",
-            })
+        latestEarnings: earningsDate
+          ? earningsDate.toLocaleDateString("en-IN", { month: "short", year: "numeric" })
           : null,
       };
 
       cache.set(cacheKey, data, CACHE_TTL);
       return data;
-    } catch (error) {
-      console.error("[YahooProvider]", symbol, error);
+    } catch {
       return { cmp: null, peRatio: null, latestEarnings: null };
     }
   }

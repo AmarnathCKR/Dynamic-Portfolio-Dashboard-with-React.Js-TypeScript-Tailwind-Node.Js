@@ -7,10 +7,11 @@ export class PortfolioService {
 
   async getPortfolio() {
     const tasks = PORTFOLIO.map((stock) => async () => {
-      const market = await this.yahoo.getStockData(stock.symbol);
-      return { ...stock, ...market };
-    });
+        const market = await this.yahoo.getStockData(stock.symbol);
+        return { ...stock, ...market };
+      });
 
     return throttle(tasks, 3);
   }
 }
+ 
